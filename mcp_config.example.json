@@ -1,12 +1,10 @@
 {
   "mcpServers": {
     "comfyui-local": {
-      "command": "<REPO_DIR>/.venv/bin/comfy-mcp",
-      "env": {
-        "COMFY_BIN": "<REPO_DIR>/.venv/bin/comfy",
-        "COMFYUI_URL": "http://127.0.0.1:8188",
-        "COMFY_MCP_REMOTE_SHARED_MODELS": "1"
-      }
+      "url": "http://127.0.0.1:8091/mcp"
+    },
+    "ai-pose-gallery": {
+      "url": "http://127.0.0.1:8090/mcp"
     }
   }
 }

@@ -1,32 +1,38 @@
-# comfyui-agent
+# comfyui-agent：Agent 生圖工作區規範
 
-讓 Agent 經 `comfy-mcp`（MCP server 名稱 `comfyui-local`）操作 [kime541200/comfyui-deploy](https://github.com/kime541200/comfyui-deploy) 啟動的 ComfyUI 容器：驗證 workflow、補齊 node 與模型、生成。環境建置（venv、偽 workspace、MCP 設定）見 `docs/setup.md`；MCP 無法連線、下載被拒、node 或模型找不到時先讀它。
+當使用者在本目錄啟動 session 要求生圖、測試 LoRA 或合成角色時，透過下列兩個 Streamable HTTP MCP Server 操作：
+- **`comfyui-local`**（[kime541200/comfy-mcp](https://github.com/kime541200/comfy-mcp)，預設 `http://127.0.0.1:8091/mcp`）：查詢節點與模型、驗證與執行 Workflow、下載模型。
+- **`ai-pose-gallery`**（[kime541200/ai-pose-gallery-mcp](https://github.com/kime541200/ai-pose-gallery-mcp)，預設 `http://127.0.0.1:8090/mcp`，選配）：檢索人像／服裝／姿勢參考圖並執行多圖角色合成。
 
-## 生成
+若 MCP 工具無法呼叫，先執行 `curl -s http://127.0.0.1:8091/health` 並參照 `docs/setup.md` 協助使用者檢查服務狀態。
 
-- 規劃 workflow 前，先用 MCP 的 `nodes` 與 `search_models` 工具查實際已安裝的 node 和模型，以此為準。
-- 流程：`validate_workflow`（參數 `workflow_path` 是檔案路徑；`valid: true`、`error_count: 0`）→ `run_workflow(wait=false)` → `job(action="wait")`；久的工作重複呼叫 `wait`。輸出在 `/data/comfyui/output`。
-- 文生圖用最小 workflow（`CheckpointLoaderSimple` → `CLIPTextEncode` ×2 → `EmptyLatentImage` → `KSampler` → `VAEDecode` → `SaveImage`）。SDXL／Illustrious 用 1024 級解析度（例 1216×832）、約 28 步、`euler_ancestral`。`generate_image` 預設是 SD1.5 範本，SDXL 系不適用。
-- Civitai 頁面 Agent 讀不到：請使用者下載 `.json`，路徑放 `tmp/`（git 忽略）。有些 Civitai 頁面是 checkpoint 而非 workflow，下載到 `models/checkpoints` 即可。
+## 1. 依任務選擇工作流與工具
 
-## 驗證錯誤的處理
-
-| `code` | 處理 |
+| 使用者需求 | 處理流程 |
 | --- | --- |
-| `unknown_class_type` | 缺 node，見「補裝 node」 |
-| `unknown_enum_value` | 看 `suggestions`：有相近路徑就改 workflow 內的檔名，沒有才下載 |
-| `no_options_available` | 該資料夾沒有模型，下載到對應資料夾 |
+| **一般文生圖（SDXL / Illustrious）** | 讀取 `workflows/sdxl-txt2img.api.json`，先用 `comfyui-local` 的 `search_models` 確認已安裝的 checkpoint 名稱填入節點 `"1"`，修改正負向提示詞與解析度。 |
+| **驗證／使用 LoRA 生圖** | 讀取 `workflows/sdxl-lora.api.json`，用 `search_models` 確認 `checkpoints` 與 `loras` 檔名填入節點 `"1"` 與 `"2"`，將 trigger word 置於正向提示詞首位。 |
+| **找姿勢／服裝／人像參考圖合成角色** | 優先使用 `ai-pose-gallery` MCP：`search_portraits` / `search_costumes` / `search_poses` 挑選候選給使用者確認後，直接呼叫 `generate_image`（或讀取 `workflows/qwen-image-edit-2509.api.json` 自訂）。 |
 
-- `download_model` 的 `relative_path` 第一段必須是 `models`（如 `models/loras`）。下載前先確認檔案大小與來源，並讓使用者確認。
-- 連遠端 ComfyUI 時 `download_model` 預設拒絕；`/data/comfyui/models` 實際是共用的，已於 MCP 設定 `COMFY_MCP_REMOTE_SHARED_MODELS=1`。
+## 2. 驗證與執行 Workflow（優先使用 JSON 直傳工具）
 
-## 補裝 node
+因為 `comfyui-local` 運行於獨立 Docker 容器，驗證與執行自訂或修改後的 workflow 時，**優先使用直傳 JSON 物件的工具**，不需依賴宿主機暫存檔路徑：
 
-- 用 `docker exec` 在容器內 `git clone --depth 1 <repo>` 到 `/app/ComfyUI/custom_nodes`，有 `requirements.txt` 就 `pip install -r`，再 `docker restart comfyui`（容器名稱見 [kime541200/comfyui-deploy](https://github.com/kime541200/comfyui-deploy) 的 `docker-compose.yml`），等 `/system_stats` 回 200 再重新驗證。視為試用：容器重建即清除。
-- `install_node`、`workflow_deps` 回報 unavailable／unsupported（見 `docs/setup.md`）。repo 網址從 [kime541200/comfyui-deploy](https://github.com/kime541200/comfyui-deploy) 的 `nodes.yaml` 或節點作者頁面查。
-- 確定要長期使用的 node，回報使用者；加入 [kime541200/comfyui-deploy](https://github.com/kime541200/comfyui-deploy) 的 `nodes.yaml` 與 profile 前先問使用者。
+1. **驗證**：呼叫 `validate_workflow_json(workflow=<dict>)`，確認回傳 `valid: true` 且 `error_count: 0`。
+2. **執行**：呼叫 `run_workflow_json(workflow=<dict>, wait=False)` 取得 `prompt_id`，再呼叫 `job(action="wait", prompt_id=...)` 等待完成（長任務可重複 wait）。生成結果位於 ComfyUI 的 `/data/comfyui/output`。
+   - 若需將參考圖上傳至 ComfyUI `input/`，可將圖片放進 `tmp/` 並呼叫 `upload_file`（或使用 `ai-pose-gallery` 的 `prepare_comfyui_workflow` / `generate_image`）。
 
-## MCP
+## 3. 驗證錯誤與缺模型／缺節點處理
 
-- 沒有 `comfyui-local` 工具、或呼叫 `system_stats` 失敗時，MCP 尚未就緒：先確認容器（`curl http://127.0.0.1:8188/system_stats`）與 `docs/setup.md` 的設定，把缺少的步驟告訴使用者；設定完成後，請使用者重啟 coding agent harness（Agent 無法自行重新載入）。
-- `comfy-mcp` 等 stdio 輸入，直接執行會卡住；驗證安裝用 `uv pip list --python .venv/bin/python`，或透過 MCP 工具呼叫。
+| `code` | 處理方式 |
+| --- | --- |
+| `unknown_class_type` | 缺少 custom node，見下方「補裝 node」 |
+| `unknown_enum_value` | 檢查 `suggestions`：若有相近模型路徑則修正 workflow 內的檔名；若無才詢問使用者是否下載 |
+| `no_options_available` | 該模型資料夾為空，下載模型至對應子目錄 |
+
+- **下載模型（`download_model`）**：
+  - `relative_path` 第一段必須是 `models`（例如 `models/checkpoints`、`models/loras`、`models/unet`）。
+  - 下載前**必須先查明檔案大小與來源並詢問使用者**；若檔案較大，也可提供指令讓使用者在終端機自行下載。
+- **補裝 node**：
+  - 臨時試用：用 `docker exec` 在 ComfyUI 容器內 `git clone --depth 1 <repo>` 到 `/app/ComfyUI/custom_nodes`（若有 `requirements.txt` 則 `pip install -r`），再 `docker restart comfyui`，待 `/system_stats` 回 200 後重新驗證。
+  - 長期保留：回報使用者，經同意後再加入 [kime541200/comfyui-deploy](https://github.com/kime541200/comfyui-deploy) 的 `nodes.yaml` 與對應 profile。
