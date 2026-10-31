@@ -4,8 +4,8 @@
 
 ## 生成
 
-- 規劃 workflow 前，先用 MCP 的 node 與 `search_models` 工具查實際已安裝的 node 和模型，以此為準。
-- 流程：`validate_workflow`（`valid: true`、`error_count: 0`）→ `run_workflow(wait=false)` → `job(action="wait")`；久的工作重複呼叫 `wait`。輸出在 `/data/comfyui/output`。
+- 規劃 workflow 前，先用 MCP 的 `nodes` 與 `search_models` 工具查實際已安裝的 node 和模型，以此為準。
+- 流程：`validate_workflow`（參數 `workflow_path` 是檔案路徑；`valid: true`、`error_count: 0`）→ `run_workflow(wait=false)` → `job(action="wait")`；久的工作重複呼叫 `wait`。輸出在 `/data/comfyui/output`。
 - 文生圖用最小 workflow（`CheckpointLoaderSimple` → `CLIPTextEncode` ×2 → `EmptyLatentImage` → `KSampler` → `VAEDecode` → `SaveImage`）。SDXL／Illustrious 用 1024 級解析度（例 1216×832）、約 28 步、`euler_ancestral`。`generate_image` 預設是 SD1.5 範本，SDXL 系不適用。
 - Civitai 頁面 Agent 讀不到：請使用者下載 `.json`，路徑放 `tmp/`（git 忽略）。有些 Civitai 頁面是 checkpoint 而非 workflow，下載到 `models/checkpoints` 即可。
 
@@ -22,8 +22,8 @@
 
 ## 補裝 node
 
-- 用 `docker exec` 在容器內 `git clone --depth 1 <repo>` 到 `/app/ComfyUI/custom_nodes`，有 `requirements.txt` 就 `pip install -r`，再 `docker restart <container>`，等 `/system_stats` 回 200 再重新驗證。視為試用：容器重建即清除。
-- `install_node`、`workflow_deps` 不可用（見 `docs/setup.md`）。repo 網址從 `../comfyui-deploy/nodes.yaml` 或節點作者頁面查。
+- 用 `docker exec` 在容器內 `git clone --depth 1 <repo>` 到 `/app/ComfyUI/custom_nodes`，有 `requirements.txt` 就 `pip install -r`，再 `docker restart comfyui`（容器名稱見 `../comfyui-deploy/docker-compose.yml`），等 `/system_stats` 回 200 再重新驗證。視為試用：容器重建即清除。
+- `install_node`、`workflow_deps` 回報 unavailable／unsupported（見 `docs/setup.md`）。repo 網址從 `../comfyui-deploy/nodes.yaml` 或節點作者頁面查。
 - 確定要長期使用的 node，回報使用者；加入 `comfyui-deploy` 的 `nodes.yaml` 與 profile 前先問使用者。
 
 ## MCP
