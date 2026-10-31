@@ -28,5 +28,5 @@
 
 ## MCP
 
+- 沒有 `comfyui-local` 工具、或呼叫 `system_stats` 失敗時，MCP 尚未就緒：先確認容器（`curl http://127.0.0.1:8188/system_stats`）與 `docs/setup.md` 的設定，把缺少的步驟告訴使用者；設定完成後，請使用者重啟 coding agent harness（Agent 無法自行重新載入）。
 - `comfy-mcp` 等 stdio 輸入，直接執行會卡住；驗證安裝用 `uv pip list --python .venv/bin/python`，或透過 MCP 工具呼叫。
-- 修改 MCP 設定後，重啟 coding agent harness 才會重新載入。設定位置依 harness 而異，見 `docs/setup.md`。

@@ -29,9 +29,15 @@ comfy_cfg=$(find ~/.config/comfy-cli -name config.ini 2>/dev/null | head -1); gr
 
 ## 3. MCP 設定
 
-`.agents/mcp_config.json` 是範本，用標準 `mcpServers` 格式。不同 harness 讀取的位置不同（例如專案根的 `.mcp.json` 或各自的設定目錄）；把同一份內容放到你所用 harness 的專案層設定即可，並重啟 harness 載入。
+`mcp_config.example.json` 是範本（標準 `mcpServers` 格式），`<REPO_DIR>` 為本目錄的絕對路徑。產生你自己的設定：
 
-- `command` 與 `COMFY_BIN`：本目錄 `.venv` 內的絕對路徑。clone 到新位置後在本目錄執行：`sed -i "s|/home/kim/workspace/local-image-gen/comfyui-agent|$PWD|g" .agents/mcp_config.json`。
+```bash
+sed "s|<REPO_DIR>|$PWD|g" mcp_config.example.json > .agents/mcp_config.json
+```
+
+不同 harness 讀取專案層 MCP 設定的位置不同；把產生的內容放到你所用 harness 的位置（`.agents/mcp_config.json` 已被 git 忽略），然後重啟 harness 載入。
+
+- `command` 與 `COMFY_BIN`：本目錄 `.venv` 內的可執行檔。
 - `COMFYUI_URL=http://127.0.0.1:8188`：ComfyUI 容器位址。
 - `COMFY_MCP_REMOTE_SHARED_MODELS=1`：讓 MCP 允許下載（未設則偵測到 `COMFYUI_URL` 就拒絕）。
 
