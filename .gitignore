@@ -1,0 +1,5 @@
+.venv/
+.env
+.agents/skills
+skills-lock.json
+tmp/

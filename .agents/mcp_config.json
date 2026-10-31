@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "comfyui-local": {
+      "command": "/home/kim/workspace/local-image-gen/comfyui-agent/.venv/bin/comfy-mcp",
+      "env": {
+        "COMFY_BIN": "/home/kim/workspace/local-image-gen/comfyui-agent/.venv/bin/comfy",
+        "COMFYUI_URL": "http://127.0.0.1:8188",
+        "COMFY_MCP_REMOTE_SHARED_MODELS": "1"
+      }
+    }
+  }
+}
