@@ -2,8 +2,8 @@
 
 前提（以下步驟可重複執行）：
 - 已安裝 `uv` 與 `docker`。
-- `comfyui-deploy` 的容器已啟動：`curl -s -o /dev/null -w "%{http_code}\n" http://127.0.0.1:8188/system_stats` 回 `200`。
-- host 上存在 `comfyui-deploy` 掛載的資料目錄：`test -d /data/comfyui/models && echo ok`。
+- [kime541200/comfyui-deploy](https://github.com/kime541200/comfyui-deploy) 的容器已啟動：`curl -s -o /dev/null -w "%{http_code}\n" http://127.0.0.1:8188/system_stats` 回 `200`。
+- host 上存在 [kime541200/comfyui-deploy](https://github.com/kime541200/comfyui-deploy) 掛載的資料目錄：`test -d /data/comfyui/models && echo ok`。
 
 ## 1. 安裝 MCP 工具
 
@@ -15,7 +15,7 @@ uv pip list --python .venv/bin/python | grep -E "comfy-cli|comfy-mcp"   # 應列
 
 ## 2. 偽 workspace（供模型下載）
 
-`comfy-cli model download` 需要一個有 ComfyUI 特徵的目錄，下載落在 `<STUB>/models`。把它指向 `comfyui-deploy` 掛載的模型目錄（以下整段在同一個 shell 執行）：
+`comfy-cli model download` 需要一個有 ComfyUI 特徵的目錄，下載落在 `<STUB>/models`。把它指向 [kime541200/comfyui-deploy](https://github.com/kime541200/comfyui-deploy) 掛載的模型目錄（以下整段在同一個 shell 執行）：
 
 ```bash
 STUB=~/comfy/ComfyUI

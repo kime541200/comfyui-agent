@@ -1,6 +1,6 @@
 # comfyui-agent
 
-讓 Agent 經 `comfy-mcp`（MCP server 名稱 `comfyui-local`）操作 `comfyui-deploy` 啟動的 ComfyUI 容器：驗證 workflow、補齊 node 與模型、生成。環境建置（venv、偽 workspace、MCP 設定）見 `docs/setup.md`；MCP 無法連線、下載被拒、node 或模型找不到時先讀它。
+讓 Agent 經 `comfy-mcp`（MCP server 名稱 `comfyui-local`）操作 [kime541200/comfyui-deploy](https://github.com/kime541200/comfyui-deploy) 啟動的 ComfyUI 容器：驗證 workflow、補齊 node 與模型、生成。環境建置（venv、偽 workspace、MCP 設定）見 `docs/setup.md`；MCP 無法連線、下載被拒、node 或模型找不到時先讀它。
 
 ## 生成
 
@@ -22,9 +22,9 @@
 
 ## 補裝 node
 
-- 用 `docker exec` 在容器內 `git clone --depth 1 <repo>` 到 `/app/ComfyUI/custom_nodes`，有 `requirements.txt` 就 `pip install -r`，再 `docker restart comfyui`（容器名稱見 `../comfyui-deploy/docker-compose.yml`），等 `/system_stats` 回 200 再重新驗證。視為試用：容器重建即清除。
-- `install_node`、`workflow_deps` 回報 unavailable／unsupported（見 `docs/setup.md`）。repo 網址從 `../comfyui-deploy/nodes.yaml` 或節點作者頁面查。
-- 確定要長期使用的 node，回報使用者；加入 `comfyui-deploy` 的 `nodes.yaml` 與 profile 前先問使用者。
+- 用 `docker exec` 在容器內 `git clone --depth 1 <repo>` 到 `/app/ComfyUI/custom_nodes`，有 `requirements.txt` 就 `pip install -r`，再 `docker restart comfyui`（容器名稱見 [kime541200/comfyui-deploy](https://github.com/kime541200/comfyui-deploy) 的 `docker-compose.yml`），等 `/system_stats` 回 200 再重新驗證。視為試用：容器重建即清除。
+- `install_node`、`workflow_deps` 回報 unavailable／unsupported（見 `docs/setup.md`）。repo 網址從 [kime541200/comfyui-deploy](https://github.com/kime541200/comfyui-deploy) 的 `nodes.yaml` 或節點作者頁面查。
+- 確定要長期使用的 node，回報使用者；加入 [kime541200/comfyui-deploy](https://github.com/kime541200/comfyui-deploy) 的 `nodes.yaml` 與 profile 前先問使用者。
 
 ## MCP
 

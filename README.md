@@ -1,6 +1,6 @@
 # comfyui-agent
 
-Agent 經 `comfy-mcp` 操作本機 ComfyUI（由 `comfyui-deploy` 以 Docker 佈署）的環境與規則。
+Agent 經 `comfy-mcp` 操作本機 ComfyUI（由 [kime541200/comfyui-deploy](https://github.com/kime541200/comfyui-deploy) 以 Docker 佈署）的環境與規則。
 
 - 環境建置：`docs/setup.md`
 - Agent 規則：`AGENTS.md`
