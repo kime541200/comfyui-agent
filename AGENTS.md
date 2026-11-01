@@ -22,7 +22,7 @@
 | --- | --- |
 | **一般文生圖（SDXL / Illustrious）** | 讀取 `workflows/sdxl-txt2img.api.json`，先用 `comfyui-local` 的 `search_models` 確認已安裝的 checkpoint 名稱填入節點 `"1"`，修改正負向提示詞與解析度。 |
 | **驗證／使用 LoRA 生圖** | 讀取 `workflows/sdxl-lora.api.json`，用 `search_models` 確認 `checkpoints` 與 `loras` 檔名填入節點 `"1"` 與 `"2"`，將 trigger word 置於正向提示詞首位。 |
-| **找姿勢／服裝／人像參考圖合成角色** | 優先使用 `ai-pose-gallery` MCP：`search_portraits` / `search_costumes` / `search_poses` 挑選候選給使用者確認後，直接呼叫 `generate_image`（或讀取 `workflows/qwen-image-edit-2509.api.json` 自訂）。 |
+| **找姿勢／服裝／人像參考圖合成角色** | 優先使用 `ai-pose-gallery` MCP：`search_portraits` / `search_costumes` / `search_poses` 挑選候選給使用者確認後，直接呼叫 `generate_image`（預設使用 `FLUX 3 Image Klein Distilled`，亦可傳入 `workflow_engine="qwen-edit"` 切換；若需自訂雙角色或多圖合成，優先讀取預設模板 `workflows/flux3-klein-edit.api.json`，備選為 `workflows/qwen-image-edit-2509.api.json`）。 |
 
 ## 2. 驗證與執行 Workflow（優先使用 JSON 直傳工具）
 

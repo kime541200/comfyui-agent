@@ -1,0 +1,219 @@
+{
+  "1": {
+    "class_type": "UNETLoader",
+    "inputs": {
+      "unet_name": "flux3-image-klein-int8-convrot.safetensors",
+      "weight_dtype": "default"
+    },
+    "_meta": {
+      "title": "Load FLUX 3 Image Klein Int8"
+    }
+  },
+  "2": {
+    "class_type": "CLIPLoader",
+    "inputs": {
+      "clip_name": "qwen3vl_4b_int8_convrot.safetensors",
+      "type": "flux3",
+      "device": "default"
+    },
+    "_meta": {
+      "title": "Load Qwen3-VL 4B Int8 Text Encoder"
+    }
+  },
+  "3": {
+    "class_type": "VAELoader",
+    "inputs": {
+      "vae_name": "flux2-vae.safetensors"
+    },
+    "_meta": {
+      "title": "Load Flux2 VAE"
+    }
+  },
+  "6": {
+    "class_type": "ModelSamplingFlux",
+    "inputs": {
+      "model": [
+        "1",
+        0
+      ],
+      "max_shift": 2.77259,
+      "base_shift": 2.77259,
+      "width": 832,
+      "height": 1216
+    },
+    "_meta": {
+      "title": "ModelSamplingFlux (Timestep Shift mu = ln(16.0))"
+    }
+  },
+  "10": {
+    "class_type": "LoadImage",
+    "inputs": {
+      "image": "portrait.png"
+    },
+    "_meta": {
+      "title": "Reference Image 1 (Portrait / Character 1)"
+    }
+  },
+  "11": {
+    "class_type": "LoadImage",
+    "inputs": {
+      "image": "costume.png"
+    },
+    "_meta": {
+      "title": "Reference Image 2 (Costume / Character 2)"
+    }
+  },
+  "12": {
+    "class_type": "LoadImage",
+    "inputs": {
+      "image": "pose.png"
+    },
+    "_meta": {
+      "title": "Reference Image 3 (Pose Mannequin)"
+    }
+  },
+  "16": {
+    "class_type": "DepthAnythingV2Preprocessor",
+    "inputs": {
+      "image": [
+        "12",
+        0
+      ],
+      "ckpt_name": "depth_anything_v2_vitl.pth",
+      "resolution": 768
+    },
+    "_meta": {
+      "title": "DepthAnythingV2 (3D Pose Depth Silhouette)"
+    }
+  },
+  "20": {
+    "class_type": "CLIPTextEncode",
+    "inputs": {
+      "clip": [
+        "2",
+        0
+      ],
+      "text": "请结合提供的 3 张参考图，融合成一张完整的人物图像：保持图1人物五官与发型，穿上图2的服饰，身体姿态严格遵循图3深度图的动作与镜头透视（忽略黑白深度图材质，还原为真实肤色与光影）。"
+    },
+    "_meta": {
+      "title": "Positive Prompt"
+    }
+  },
+  "21": {
+    "class_type": "CLIPTextEncode",
+    "inputs": {
+      "clip": [
+        "2",
+        0
+      ],
+      "text": ""
+    },
+    "_meta": {
+      "title": "Negative Prompt (unused at cfg 1)"
+    }
+  },
+  "17": {
+    "class_type": "ReferenceMultiLatent",
+    "inputs": {
+      "positive": [
+        "20",
+        0
+      ],
+      "negative": [
+        "21",
+        0
+      ],
+      "vae": [
+        "3",
+        0
+      ],
+      "resolution": "resize",
+      "resolution.megapixels": 1.0,
+      "images.image0": [
+        "10",
+        0
+      ],
+      "images.image1": [
+        "11",
+        0
+      ],
+      "images.image2": [
+        "16",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "Set Reference Multi Latent"
+    }
+  },
+  "22": {
+    "class_type": "EmptyFlux2LatentImage",
+    "inputs": {
+      "width": 832,
+      "height": 1216,
+      "batch_size": 1
+    },
+    "_meta": {
+      "title": "EmptyFlux2LatentImage"
+    }
+  },
+  "23": {
+    "class_type": "KSampler",
+    "inputs": {
+      "model": [
+        "6",
+        0
+      ],
+      "positive": [
+        "17",
+        0
+      ],
+      "negative": [
+        "17",
+        1
+      ],
+      "latent_image": [
+        "22",
+        0
+      ],
+      "seed": 42,
+      "steps": 16,
+      "cfg": 1.0,
+      "sampler_name": "euler",
+      "scheduler": "simple",
+      "denoise": 1.0
+    },
+    "_meta": {
+      "title": "KSampler (16 Steps Distilled, CFG 1)"
+    }
+  },
+  "24": {
+    "class_type": "VAEDecode",
+    "inputs": {
+      "samples": [
+        "23",
+        0
+      ],
+      "vae": [
+        "3",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "VAE Decode"
+    }
+  },
+  "25": {
+    "class_type": "SaveImage",
+    "inputs": {
+      "images": [
+        "24",
+        0
+      ],
+      "filename_prefix": "comfyui-agent/flux3-klein"
+    },
+    "_meta": {
+      "title": "Save Image"
+    }
+  }
+}
