@@ -6,6 +6,16 @@
 
 若 MCP 工具無法呼叫，先執行 `curl -s http://127.0.0.1:8091/health` 並參照 `docs/setup.md` 協助使用者檢查服務狀態。
 
+## 0. MCP 調用規範（嚴禁繞道執行宿主機腳本）
+
+- **強制使用 MCP 工具**：本工作區所有素材檢索、工作流驗證、生圖與 ComfyUI 管理**一律必須透過 MCP 工具**操作，僅在 MCP 工具無法達成目標時才停下來向用戶確認。
+- **嚴禁繞道執行本機命令**：**嚴格禁止**自行透過 `run_command` 呼叫宿主機 Python 虛擬環境（如 `.venv/bin/python`）、寫臨時 Python 腳本或用 curl 直接存取後端 API 來代替 MCP 工具。
+- **Lazy MCP 調用方式**：在 Antigravity 等 Agent 執行環境中，`comfyui-local` 與 `ai-pose-gallery` 均註冊為 **Lazy-loaded MCP Server**（頂層工具清單中不會出現 `mcp_*` 原生前綴）。Agent **絕對不得誤判為「未註冊工具」**，而必須透過 **`call_mcp_tool`** 進行調用：
+  - `ServerName`: `"comfyui-local"` 或 `"ai-pose-gallery"`
+  - `ToolName`: 對應工具名稱（例如 `search_poses`、`search_costumes`、`generate_image`、`validate_workflow_json` 等）
+  - `Arguments`: 對應工具的參數字典
+- **工具綱要查閱**：呼叫前若需確認工具參數定義，可先讀取 `<appDataDir>/mcp/<serverName>/<toolName>.json` 查閱 Schema。
+
 ## 1. 依任務選擇工作流與工具
 
 | 使用者需求 | 處理流程 |
