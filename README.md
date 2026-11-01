@@ -15,7 +15,7 @@
 - `workflows/`：已驗證的 ComfyUI API 格式工作流模板：
   - `workflows/sdxl-txt2img.api.json`：SDXL / Illustrious 1024 級標準文生圖。
   - `workflows/sdxl-lora.api.json`：SDXL / Illustrious 載入 LoRA 驗證與生圖（可搭配 [kime541200/lora-training](https://github.com/kime541200/lora-training) 產出的模型）。
-  - `workflows/qwen-image-edit-2509.api.json`：Qwen-Image-Edit-2509 三圖參考（人像＋服裝＋姿勢 DWPose 骨架）合成工作流。
+  - `workflows/qwen-image-edit-2509.api.json`：Qwen-Image-Edit-2509 三圖參考（人像＋服裝＋姿勢 DepthAnythingV2 3D 深度輪廓）合成工作流。
 - `mcp_config.example.json`：預先配置好 `comfyui-local` 與 `ai-pose-gallery` 的 Streamable HTTP MCP 設定範本。
 - `docs/setup.md`：環境建置與連線檢查說明。
 - `AGENTS.md`：Agent 操作 ComfyUI 與工作流模板的完整規則。

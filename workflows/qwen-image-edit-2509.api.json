@@ -113,13 +113,13 @@
   "15": {
     "class_type": "ImageScaleToTotalPixels",
     "inputs": {
-      "image": ["17", 0],
+      "image": ["16", 0],
       "upscale_method": "lanczos",
       "megapixels": 1,
       "resolution_steps": 1
     },
     "_meta": {
-      "title": "Scale Pose Skeleton"
+      "title": "Scale Pose Depth Map"
     }
   },
   "16": {
@@ -130,23 +130,7 @@
       "resolution": 768
     },
     "_meta": {
-      "title": "DepthAnythingV2 (Strip Mannequin Lines)"
-    }
-  },
-  "17": {
-    "class_type": "DWPreprocessor",
-    "inputs": {
-      "image": ["16", 0],
-      "detect_hand": "enable",
-      "detect_body": "enable",
-      "detect_face": "disable",
-      "resolution": 768,
-      "bbox_detector": "yolox_l.onnx",
-      "pose_estimator": "dw-ll_ucoco_384_bs5.torchscript.pt",
-      "scale_stick_for_xinsr_cn": "disable"
-    },
-    "_meta": {
-      "title": "DWPose Keypoint Skeleton"
+      "title": "DepthAnythingV2 (3D Pose Depth Silhouette)"
     }
   },
   "20": {
